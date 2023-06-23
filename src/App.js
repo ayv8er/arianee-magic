@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Wallet from "@arianee/wallet";
 import Core from "@arianee/core";
 import { magic } from "./libs/magic";
-import { web3 } from './libs/web3';
+import {ethersProvider, web3} from './libs/web3';
 import "./App.css";
 
 function App() {
@@ -22,31 +22,26 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      const walletAddress = await web3.eth.getAccounts();
+      const signer = await ethersProvider.getSigner();
+      const walletAddress = await signer.getAddress();
 
       const core = new Core(
-        async (message) => {
-          const signature = await web3.eth.sign(message, walletAddress[0]);
-          return { message, signature: signature }
-        },
-        async (data) => {
-          const signature = await web3.eth.signTransaction({
-            from: walletAddress[0],
-            to: data.to.toString(),
-            value: data.value.toString(),
-            gas: parseInt(data.gasLimit),
-            maxFeePerGas: parseInt(data.maxFeePerGas),
-            maxPriorityFeePerGas: parseInt(data.maxPriorityFeePerGas),
-            chainId: parseInt(data.chainId),
-            data: data.data,
-          });
-          console.log('async2', data)
-          console.log('async2', signature)
-          return { message: data, signature: signature.rawTransaction }
-        },
-        () => {
-          return walletAddress[0];
-        }
+          {
+            signMessage:async (message) => {
+              const signature = await web3.eth.sign(message, walletAddress);
+              return { message, signature: signature }
+            },
+            sendTransaction:async (data) => {
+              console.log('data', data)
+              const tx = await signer.sendTransaction(data)
+              console.log('async2', data)
+              console.log('async2', tx)
+              return tx
+            },
+            getAddress:() => {
+              return walletAddress;
+            }
+          }
       );
       const arianee = new Wallet({ chainType: 'testnet', auth: { core: core } })
       setWallet(arianee)
