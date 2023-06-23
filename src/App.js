@@ -40,6 +40,8 @@ function App() {
             chainId: parseInt(data.chainId),
             data: data.data,
           });
+          console.log('async2', data)
+          console.log('async2', signature)
           return { message: data, signature: signature.rawTransaction }
         },
         () => {
@@ -99,6 +101,18 @@ function App() {
     }
   }
 
+  const handleSignTransaction = async () => {
+    const walletAddress = await web3.eth.getAccounts();
+    try {
+      const signature = await web3.eth.signTransaction({
+        from: walletAddress[0],
+      })
+      console.log('signature', signature)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   return (
     <main>
       <div>
@@ -118,6 +132,7 @@ function App() {
       </div>
       <div>
         <button onClick={handlePrintMetadata}>Print Info</button>
+        <button onClick={handleSignTransaction}>Sign Transaction</button>
         <button onClick={handleClaim}>smartAsset Claim</button>
         <button onClick={handleGetOwned}>smartAsset GetOwned</button>
       </div>
