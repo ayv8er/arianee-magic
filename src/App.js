@@ -13,6 +13,7 @@ function App() {
   useEffect(() => {
     const checkisLoggedIn = async () => {
       const boolean = await magic.user.isLoggedIn();
+      console.log('boolean', boolean)
       if (boolean) {
         setIsLoggedIn(boolean);
       }
@@ -80,7 +81,7 @@ function App() {
 
   const handleClaim = async () => {
     try {
-      const res = await wallet.smartAsset.claim('testnet', '74247253', 'ry78jyriuwl7');
+      const res = await wallet.smartAsset.claim('testnet', '91403904', 'e9kial696blf');
       console.log(res)
     } catch (err) {
       console.log(err)
